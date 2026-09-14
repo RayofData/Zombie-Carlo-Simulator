@@ -6,40 +6,48 @@ from src.zombie_carlo.model import SIED
 
 def single_run_plot(results):
     """Plots a single trail run from simulation."""
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(8,5))
 
     ax.plot(
         results["Day"], 
         results["Susceptible"],
         label="Susceptible",
-        color = "blue"
+        color="steelblue",
+        linewidth=2
     )
 
     ax.plot(
         results["Day"], 
         results["Infected"],
         label="Infected",
-        color = "green"
+        color="darkseagreen",
+        linewidth=2
     )
 
     ax.plot(
         results["Day"],
         results["Eliminated"],
         label="Eliminated",
-        color = "grey"
+        color="dimgrey",
+        linewidth=2
     )
 
     ax.plot(
         results["Day"],
         results["Decayed"],
         label="Decayed",
-        color = "black"
+        color="black",
+        linewidth=2
     )
     
     ax.set_xlabel("Day")
     ax.set_ylabel("Population")
-    ax.set_title("Single Zombie Outbreak")
-    ax.legend()
+    ax.set_title("One Possible Zombie Outbreak")
+
+    ax.grid(axis="y", alpha=0.15)
+    ax.legend(frameon=False)
+
+    fig.tight_layout()
 
     
     return fig
@@ -90,14 +98,48 @@ def monte_carlo_band_plot(daily_results, category):
 
 
 def final_survivors_plot(final_survivors):
-    """Plots a histogram of the final survivors for all simulations."""
-    fig, ax = plt.subplots()
+    """Plots a histogram of the final survivors with Zombie Carlo styling."""
+    fig, ax = plt.subplots(figsize=(8,5))
 
-    ax.hist(final_survivors)
+    mean_survivors = final_survivors.mean()
+    median_survivors = final_survivors.median()
 
-    ax.set_xlabel("Final Survivors")
+    ax.hist(
+        final_survivors,
+        bins=20,
+        color="darkseagreen",
+        edgecolor="white",
+        linewidth=0.8,
+        alpha=0.9
+    )
+
+    ax.axvline(
+        median_survivors, 
+        color = "dimgray",
+        linestyle = ":",
+        linewidth = 2,
+        label = f"Median: {median_survivors:.0f}"
+    )
+
+    ax.axvline(
+        mean_survivors, 
+        color = "firebrick",
+        linestyle = "--",
+        linewidth = 2,
+        label = f"Mean: {mean_survivors:.0f}"
+    )
+
+    ax.set_xlabel("Humans Remaining")
     ax.set_ylabel("Number of Simulations")
-    ax.set_title("Final Survivors Distribution")
+    ax.set_title("Who Survived the Outbreak?")
+
+    ax.grid(
+        axis="y",
+        alpha=0.15
+    )
+
+    ax.legend(frameon=False)
+
     fig.tight_layout()
     
     return fig
