@@ -1,16 +1,28 @@
 import streamlit as st 
 
 from src.zombie_carlo.model import ZombieSIR
+from src.zombie_carlo.plots import (
+    single_run_plot,
+    final_survivors_plot
+)
 
 st.title("Zombie Carlo Simulator")
 
 
-model = ZombieSIR()
+model = ZombieSIR(days=200, beta=0.6, gamma=0.1)
 
 model.run_simulation()
 st.write(model.results)
+
+fig1 = single_run_plot(model.results)
+
+st.pyplot(fig1)
 
 
 results = model.run_monte_carlo()
 
 st.write(results)
+
+fig2 = final_survivors_plot(results["final_survivors"])
+
+st.pyplot(fig2)
