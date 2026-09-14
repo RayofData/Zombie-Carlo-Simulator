@@ -3,6 +3,7 @@
 import pandas as pd 
 import numpy as np 
 
+SIED = ["Susceptible", "Infected", "Eliminated", "Decayed"]
 
 class ZombieSIR:
     def __init__(
@@ -75,7 +76,7 @@ class ZombieSIR:
     def _get_daily_results(self, trail):
         """Return selected daily results for one Monte Carlo trail."""
         daily_results = self.results[
-            ["Day", "Susceptible", "Infected", "Decayed"]
+            ["Day"] + SIED
         ].copy()
 
         daily_results.insert(0, "Trail", trail)
@@ -107,7 +108,7 @@ class ZombieSIR:
 
             total_ever_infected = self.num_individuals - final_survivors
 
-            extinct = final_survivors == 0 
+            zombie_extinct = final_infected == 0 
 
             apocalypse = (total_ever_infected / self.num_individuals >= 0.8)
 
@@ -120,7 +121,7 @@ class ZombieSIR:
                     "final_decayed": final_decayed,
                     "total_ever_infected": total_ever_infected,
                     "peak_infected": peak_infected,
-                    "extinct": extinct,
+                    "zombie_extinct": zombie_extinct,
                     "apocalypse": apocalypse
                 }
             )

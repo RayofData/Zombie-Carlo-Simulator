@@ -2,6 +2,8 @@
 
 import matplotlib.pyplot as plt 
 
+from src.zombie_carlo.model import SIED
+
 def single_run_plot(results):
     """Plots a single trail run from simulation."""
     fig, ax = plt.subplots()
@@ -45,6 +47,8 @@ def single_run_plot(results):
 
 def monte_carlo_band_plot(daily_results, category):
     """Plot median active zombies and Monte Carlo percentile bands."""
+    if category not in SIED:
+        raise ValueError("Not a daily reported category.")
     results_by_day = (
         daily_results.groupby("Day")[category]
         .quantile([0.05, 0.25, 0.50, 0.75, 0.95])

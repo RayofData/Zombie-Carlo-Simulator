@@ -10,7 +10,7 @@ from src.zombie_carlo.plots import (
 st.title("Zombie Carlo Simulator")
 
 
-model = ZombieSIR(days=200, beta=0.6, gamma=0.1)
+model = ZombieSIR()
 
 model.run_simulation()
 st.write(model.results)
