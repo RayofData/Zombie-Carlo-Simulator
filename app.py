@@ -3,6 +3,7 @@ import streamlit as st
 from src.zombie_carlo.model import ZombieSIR
 from src.zombie_carlo.plots import (
     single_run_plot,
+    monte_carlo_band_plot,
     final_survivors_plot
 )
 
@@ -23,6 +24,10 @@ results, daily_results = model.run_monte_carlo()
 
 st.write(results)
 
-fig2 = final_survivors_plot(results["final_survivors"])
+fig2 = monte_carlo_band_plot(daily_results, "Infected")
 
 st.pyplot(fig2)
+
+fig3 = final_survivors_plot(results["final_survivors"])
+
+st.pyplot(fig3)
