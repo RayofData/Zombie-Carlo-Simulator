@@ -8,6 +8,9 @@ st.title("Zombie Carlo Simulator")
 model = ZombieSIR()
 
 model.run_simulation()
+st.write(model.results)
+
+
 results = model.run_monte_carlo()
 
 st.write(results)
