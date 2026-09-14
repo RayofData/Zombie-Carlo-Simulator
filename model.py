@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np 
 import matplotlib.pyplot as plt 
 
+
 class ZombieSIR:
     def __init__(
         self,
@@ -34,11 +35,14 @@ class ZombieSIR:
     def run_simulation(self):
         S = [self.susceptible]
         I = [self.infected]
-        E = [self.eliminated ]
+        E = [self.eliminated]
         D = [self.decayed_zombies]
 
         for _ in range(1, self.days):
-            infection_probability = min(self.beta * I[-1] / self.num_individuals, 1.0)
+            infection_probability = min(
+                self.beta * I[-1] / self.num_individuals, 
+                1.0
+            )
             new_infections = np.random.binomial(S[-1], infection_probability)
             removed = np.random.binomial(I[-1], self.gamma)
             new_decayed = np.random.binomial(removed, self.decay_fraction)
@@ -48,26 +52,51 @@ class ZombieSIR:
             E.append(E[-1] + new_eliminated)
             D.append(D[-1] + new_decayed)
 
-        self.results = pd.DataFrame.from_dict({"Time":list(range(len(S))),
-            "Susceptible":S, "Infected":I, "Eliminated":E, "Decayed":D},
-            orient="index").transpose()
+        self.results = pd.DataFrame(
+            {
+                "Day": range(len(S)),
+                "Susceptible": S,
+                "Infected": I,
+                "Eliminated": E,
+                "Decayed": D
+            },
+            orient="index"
+        ).transpose()
         self.model_run = True
 
 
-        
-for _ in range(3):
-    model = ZombieSIR()
-    model.run_simulation()
+    def run_monte_carlo(self, trials=1000):   
+        outcomes = []
 
-    print(model.results.iloc[-20])
+        for _ in range(trials):
+            self.run_simulation()
 
-    totals = (
-        model.results["Susceptible"]
-        + model.results["Infected"]
-        + model.results["Eliminated"]
-        + model.results["Decayed"]
-    )
+            final_survivors = self.results["Susceptible"].iloc[-1]
+            final_infected = self.results["Infected"].iloc[-1]
+            final_eliminated = self.results["Eliminated"].iloc[-1]
+            final_decayed = self.results["Decayed"].iloc[-1]
 
-    print(totals.min())
-    print(totals.max())
-    print(model.results.head(10))
+            peak_infected = self.results["Infected"].max()
+
+            total_ever_infected = self.num_individuals - final_survivors
+
+            extinct = final_infected == 0
+
+            apocalypse = (total_ever_infected / self.num_individuals >= 0.8)
+
+            outcomes.append(
+                {
+                    "final_survivors": final_survivors,
+                    "final_infected": final_infected,
+                    "final_eliminated": final_eliminated,
+                    "final_decayed": final_decayed,
+                    "total_ever_infected": total_ever_infected,
+                    "peak_infected": peak_infected,
+                    "extinct": extinct,
+                    "apocalypse": apocalypse
+                }
+            )
+
+        return pd.DataFrame(outcomes)
+
+
