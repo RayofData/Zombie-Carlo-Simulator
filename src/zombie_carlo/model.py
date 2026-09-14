@@ -91,7 +91,7 @@ class ZombieSIR:
 
             total_ever_infected = self.num_individuals - final_survivors
 
-            extinct = final_infected == 0
+            extinct = final_survivors == 0 
 
             apocalypse = (total_ever_infected / self.num_individuals >= 0.8)
 
