@@ -24,7 +24,7 @@ class ZombieSIR:
             raise ValueError("Infected population must be a positive integer.")
         if not 0 <= beta <= 1:
             raise ValueError("Beta must be between 0 and 1.")
-        if not 0 <= gamma <= 1:
+        if not 0 < gamma <= 1:
             raise ValueError("Gamma must be between 0 and 1.")
         if not 0 <= decay_fraction <= 1:
             raise ValueError("Decay fraction must be between 0 and 1.")
