@@ -19,7 +19,7 @@ fig1 = single_run_plot(model.results)
 st.pyplot(fig1)
 
 
-results = model.run_monte_carlo()
+results, daily_results = model.run_monte_carlo()
 
 st.write(results)
 

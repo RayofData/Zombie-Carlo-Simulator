@@ -44,6 +44,7 @@ def single_run_plot(results):
 
 
 
+
 def final_survivors_plot(final_survivors):
     """Plots a histogram of the final survivors for all simulations."""
     fig, ax = plt.subplots()

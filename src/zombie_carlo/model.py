@@ -72,15 +72,31 @@ class ZombieSIR:
         )
 
 
+    def _get_daily_results(self, trail):
+        """Return selected daily results for one Monte Carlo trail."""
+        daily_results = self.results[
+            ["Day", "Susceptible", "Infected", "Decayed"]
+        ].copy()
+
+        daily_results.insert(0, "Trail", trail)
+
+        return daily_results
+
+
     def run_monte_carlo(self, trials=1000): 
         """Run repeated outbreak simulations and return their outcomes."""
 
         if not isinstance(trials, int) or trials <= 0:
             raise ValueError("Number of trials must be a positive integer.")  
         outcomes = []
+        daily_results = []
 
-        for _ in range(trials):
+        for trail in range(1, trials + 1):
             self.run_simulation()
+
+            daily_results.append(
+                self._get_daily_results(trail)
+            )
 
             final_survivors = self.results["Susceptible"].iloc[-1]
             final_infected = self.results["Infected"].iloc[-1]
@@ -97,6 +113,7 @@ class ZombieSIR:
 
             outcomes.append(
                 {
+                    "trail": trail,
                     "final_survivors": final_survivors,
                     "final_infected": final_infected,
                     "final_eliminated": final_eliminated,
@@ -108,4 +125,11 @@ class ZombieSIR:
                 }
             )
 
-        return pd.DataFrame(outcomes)
+        outcomes_df = pd.DataFrame(outcomes)
+
+        daily_results_df = pd.concat(
+            daily_results,
+            ignore_index=True
+        )
+
+        return outcomes_df, daily_results_df
