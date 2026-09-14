@@ -3,3 +3,5 @@
 
 # Local environment variables
 .env
+
+__pycache__
