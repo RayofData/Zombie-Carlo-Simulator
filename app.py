@@ -7,6 +7,52 @@ from src.zombie_carlo.plots import (
     final_survivors_plot
 )
 
+PRESETS = {
+    "Classic Movie Zombies": {
+        "beta": 0.10,
+        "gamma": 0.05,
+        "decay_fraction": 0.10
+    },
+    "Apocalypse Zombies": {
+        "beta": 0.30,
+        "gamma": 0.03,
+        "decay_fraction": 0.03
+    },
+    "Runner Zombies": {
+        "beta": 0.45,
+        "gamma": 0.08,
+        "decay_fraction": 0.08
+    },
+    "Viral Zombies": {
+        "beta": 0.75,
+        "gamma": 0.25,
+        "decay_fraction": 0.05
+    },
+    "Rotter Zombies": {
+        "beta": 0.18,
+        "gamma": 0.15,
+        "decay_fraction": 0.70
+    },
+    "Custom": {
+        "beta": 0.20,
+        "gamma": 0.06,
+        "decay_fraction": 0.05
+    }
+}
+
+
+def load_preset():
+    preset = PRESETS[st.session_state.preset]
+
+    st.session_state.beta = preset["beta"]
+    st.session_state.gamma = preset["gamma"]
+    st.session_state.decay_fraction = preset["decay_fraction"]
+
+
+if "preset" not in st.session_state:
+    st.session_state.preset = "Classic Movie Zombies"
+    load_preset()
+
 st.title("Zombie Carlo Simulator")
 
 st.write(
@@ -21,6 +67,14 @@ st.write(
 st.sidebar.header("Outbreak Setup")
 st.sidebar.caption(
     "Choose the outbreak parameters, then select Run Simulation to see the results."
+)
+
+st.sidebar.selectbox(
+    "Zombie Preset",
+    PRESETS.keys(),
+    key="preset",
+    on_change=load_preset,
+    help="Choose a starting scenario. You can adjust its parameters below."
 )
 
 use_seed = st.sidebar.toggle(
@@ -78,11 +132,10 @@ with st.sidebar.form("simulation_controls"):
         "$\\beta$",
         min_value=0.00001,
         max_value=1.0,
-        value=0.2,
+        key="beta",
         help=(
-            "Transmission rate (0 < $\\beta$ <= 1). Controls how quickly susceptible "
-            "humans become zombies. The daily infection probability also depends "
-            "on the proportion of the population currently infected."
+            "Transmission rate (0 < beta <= 1). Controls how quickly susceptible "
+            "humans become zombies."
         )
     )
     st.caption("Higher $\\beta$ = faster zombie spread.")
@@ -91,10 +144,10 @@ with st.sidebar.form("simulation_controls"):
         "$\gamma$",
         min_value=0.00001,
         max_value=1.0,
-        value=0.06,
+        key="gamma",
         help=(
-            "Removal rate (0 < $\gamma$ <= 1). Represents the daily probability that "
-            "an active zombie is removed from the outbreak."
+            "Removal rate (0 < gamma <= 1). Represents the daily probability "
+            "that an active zombie is removed from the outbreak."
         )
     )
     st.caption("Higher $\gamma$ = zombies are removed faster.")
@@ -103,8 +156,8 @@ with st.sidebar.form("simulation_controls"):
         "Decay Fraction",
         min_value=0.0,
         max_value=1.0,
-        value=0.05,
-        help="Fraction of zombies that will decay on their own."
+        key="decay_fraction",
+        help="Share of removed zombies that decay instead of being eliminated."
     )
 
     run_simulation = st.form_submit_button("Run Simulation")
