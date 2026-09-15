@@ -9,8 +9,8 @@ class ZombieSIR:
     def __init__(
         self,
         days=100, 
-        susceptible=999, 
-        infected=1, 
+        population=1000, 
+        initial_zombies=1, 
         beta=0.05, 
         gamma=0.01,
         decay_fraction=0.05,
@@ -18,9 +18,9 @@ class ZombieSIR:
     ):
         if not isinstance(days, int) or days <= 0:
             raise ValueError("Days must be a positive integer.")
-        if not isinstance(susceptible, int) or susceptible <= 0:
-            raise ValueError("Susceptible population must be a positive integer.")
-        if not isinstance(infected, int) or infected <= 0:
+        if not isinstance(population, int) or population <= 0:
+            raise ValueError("Initial population must be a positive integer.")
+        if not isinstance(initial_zombies, int) or initial_zombies <= 0:
             raise ValueError("Infected population must be a positive integer.")
         if not 0 <= beta <= 1:
             raise ValueError("Beta must be between 0 and 1.")
@@ -30,14 +30,14 @@ class ZombieSIR:
             raise ValueError("Decay fraction must be between 0 and 1.")
     
         self.days = days
-        self.susceptible = susceptible
-        self.infected = infected
+        self.population = population
+        self.susceptible = population - initial_zombies
+        self.infected = initial_zombies
         self.eliminated = 0
         self.decayed_zombies = 0
         self.beta = beta
         self.gamma = gamma
         self.decay_fraction = decay_fraction
-        self.num_individuals = susceptible + infected
         self.results = None
         self.rng = np.random.default_rng(seed)
 
@@ -49,8 +49,8 @@ class ZombieSIR:
         E = [self.eliminated]
         D = [self.decayed_zombies]
 
-        for _ in range(1, self.days):
-            infection_probability = self.beta * I[-1] / self.num_individuals
+        for _ in range(1, self.days + 1):
+            infection_probability = self.beta * I[-1] / self.population
             new_infections = self.rng.binomial(S[-1], infection_probability)
 
             removed = self.rng.binomial(I[-1], self.gamma)
@@ -73,13 +73,13 @@ class ZombieSIR:
         )
 
 
-    def _get_daily_results(self, trail):
-        """Return selected daily results for one Monte Carlo trail."""
+    def _get_daily_results(self, trial):
+        """Return selected daily results for one Monte Carlo trial."""
         daily_results = self.results[
             ["Day"] + SIED
         ].copy()
 
-        daily_results.insert(0, "Trail", trail)
+        daily_results.insert(0, "trial", trial)
 
         return daily_results
 
@@ -92,11 +92,11 @@ class ZombieSIR:
         outcomes = []
         daily_results = []
 
-        for trail in range(1, trials + 1):
+        for trial in range(1, trials + 1):
             self.run_simulation()
 
             daily_results.append(
-                self._get_daily_results(trail)
+                self._get_daily_results(trial)
             )
 
             final_survivors = self.results["Susceptible"].iloc[-1]
@@ -106,15 +106,15 @@ class ZombieSIR:
 
             peak_infected = self.results["Infected"].max()
 
-            total_ever_infected = self.num_individuals - final_survivors
+            total_ever_infected = self.population - final_survivors
 
             zombie_extinct = final_infected == 0 
 
-            apocalypse = (total_ever_infected / self.num_individuals >= 0.8)
+            apocalypse = (total_ever_infected / self.population >= 0.8)
 
             outcomes.append(
                 {
-                    "trail": trail,
+                    "trial": trial,
                     "final_survivors": final_survivors,
                     "final_infected": final_infected,
                     "final_eliminated": final_eliminated,
