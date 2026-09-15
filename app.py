@@ -18,9 +18,74 @@ st.write(
     """
 )
 
+with st.sidebar.form("simulation_controls"):
+    st.subheader("Outbreak Setup")
+
+    population = st.number_input(
+        "Population",
+        min_value=2,
+        value=1000,
+        help="Total number of humans and zombies at the start of the simulation."
+    )
+
+    initial_zombies = st.number_input(
+        "Initial Zombies",
+        min_value=1,
+        max_value=population - 1,
+        value=1,
+        help="Number of zombies present when the outbreak begins."
+    )
+
+    days = st.slider(
+        "Simulation Days",
+        min_value=10,
+        max_value=365,
+        value=100,
+        help="Number of days simulated for each outbreak."
+    )
+
+    trials = st.select_slider(
+        "Monte Carlo Runs",
+        options=[100, 500, 1_000, 5_000, 10_000, 50_000],
+        value=1_000,
+        help=(
+            "Number of times the same outbreak scenario is simulated. "
+            "More runs give more stable estimates but take longer."
+        )
+    )
+
+    beta = st.number_input(
+        "Beta",
+        min_value=0.00001,
+        max_value=1.0,
+        value=0.2,
+        help=(
+            "Transmission rate. Beta controls how quickly susceptible humans "
+            "become zombies. Higher values make infection spread more quickly. "
+            "The daily infection probability also depends on the proportion "
+            "of the population that is currently infected."
+        )
+    )
+    st.caption("Higher beta = faster zombie spread.")
+
+    gamma = st.number_input(
+        "Gamma",
+        min_value=0.00001,
+        max_value=1.0,
+        value=0.06,
+        help=(
+            "Removal rate. Gamma is the probability that an active zombie is "
+            "removed from the outbreak during a day. Higher values remove "
+            "zombie faster and make outbreaks easier to stop."
+        )
+    )
+    st.caption("Higher gamma = zombies are removed faster.")
+
+    run_simulation = st.form_submit_button("Run Simulation")
+
 st.divider()
 
-model = ZombieSIR(beta=.5, gamma=.2)
+model = ZombieSIR(days=days, population=population, initial_zombies=initial_zombies, beta=beta, gamma=gamma)
 model.run_simulation()
 
 st.subheader("Outbreak Setup")
@@ -46,7 +111,9 @@ final_decayed_col.metric(label="Final Decayed", value=model.results["Decayed"].i
 fig1 = single_run_plot(model.results)
 st.pyplot(fig1)
 
-results, daily_results = model.run_monte_carlo()
+with st.spinner("Running Monte Carlo simulations...", show_time=True):
+    results, daily_results = model.run_monte_carlo(trials=trials)
+st.success("Simulations complete!")
 
 fig2 = monte_carlo_band_plot(daily_results, "Infected")
 st.pyplot(fig2)
