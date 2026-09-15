@@ -120,7 +120,7 @@ with st.sidebar.form("simulation_controls"):
 
     trials = st.select_slider(
         "Monte Carlo Runs",
-        options=[100, 500, 1_000, 5_000, 10_000, 50_000],
+        options=[100, 500, 1_000, 5_000, 10_000],
         value=1_000,
         help=(
             "Number of times the same outbreak scenario is simulated. "
@@ -141,7 +141,7 @@ with st.sidebar.form("simulation_controls"):
     st.caption("Higher $\\beta$ = faster zombie spread.")
 
     gamma = st.number_input(
-        "$\gamma$",
+        "$\\gamma$",
         min_value=0.00001,
         max_value=1.0,
         key="gamma",
@@ -150,7 +150,7 @@ with st.sidebar.form("simulation_controls"):
             "that an active zombie is removed from the outbreak."
         )
     )
-    st.caption("Higher $\gamma$ = zombies are removed faster.")
+    st.caption("Higher $\\gamma$ = zombies are removed faster.")
 
     decay_fraction = st.number_input(
         "Decay Fraction",
@@ -161,6 +161,9 @@ with st.sidebar.form("simulation_controls"):
     )
 
     run_simulation = st.form_submit_button("Run Simulation")
+
+if not run_simulation:
+    st.stop()
 
 st.divider()
 
@@ -213,8 +216,9 @@ st.success("Simulations complete!")
 extinction_probability = results["zombie_extinct"].mean()*100
 apocalypse_probability = results["apocalypse"].mean()*100
 median_survivors = results["final_survivors"].median()
+median_peak_zombies = results["peak_infected"].median()
 
-extinct_col, apocalypse_col, survivors_col = st.columns(3)
+extinct_col, apocalypse_col, survivors_col, zombie_col = st.columns(4)
 
 extinct_col.metric(
     "Zombie Extinction",
@@ -229,6 +233,11 @@ apocalypse_col.metric(
 survivors_col.metric(
     "Median Survivors",
     f"{median_survivors:,.0f}"
+)
+
+zombie_col.metric(
+    "Median Peak Zombies",
+    f"{median_peak_zombies:,.0f}"
 )
 
 

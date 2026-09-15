@@ -1,127 +1,151 @@
-# Zombie Carlo Simulator MVP
+# Zombie Carlo Simulator
 
-An **Streamlit Monte Carlo simulator** for a fictional zombie outbreak using an SIR-style model.
-
-The simulator will run the same outbreak many times with randomness so the user can see a range of possible outcomes instead of one fixed result.
+Zombie Carlo is a Streamlit Monte Carlo simulator for a fictional zombie
+outbreak. It uses a stochastic SIR-style compartment model to show both one
+possible outbreak and the range of outcomes that can occur under the same
+starting conditions.
 
 ## Core Model
 
-Track four groups:
+The model tracks four population groups:
 
-* `susceptible` = humans who can still become zombies
-* `infected` = active zombies spreading the outbreak
-* `eliminated` = zombies removed by survivors
-* `decayed_zombies` = zombies removed because they decay
+* `Susceptible`: humans who can still become zombies
+* `Infected`: active zombies spreading the outbreak
+* `Eliminated`: zombies removed by survivors
+* `Decayed`: zombies removed through decay
 
-`eliminated + decayed_zombies` make up the model's removed population.
+The total population is conserved throughout each simulation:
+
+$$
+Susceptible + Infected + Eliminated + Decayed = Population
+$$
+
+Each day, the model uses binomial random draws to determine:
+
+1. how many susceptible humans become infected
+2. how many active zombies are removed
+3. how the removed zombies are split between eliminated and decayed
+
+The daily infection probability is:
+
+$$
+p_{infection} = \beta \frac{Infected}{Population}
+$$
 
 The main parameters are:
 
-* **$\beta$ (beta)** = transmission rate, or how quickly zombies create new zombies
-* **$\gamma$ (gamma)** = removal rate, or how quickly active zombies stop spreading
-* **$R_0$** = estimated number of new zombies one zombie would create when nearly everyone is still susceptible
-* **decay fraction** = the share of removed zombies that become `decayed_zombies` instead of `eliminated`
+* **$\beta$ (beta)**: transmission rate, which controls how quickly zombies
+  create new zombies
+* **$\gamma$ (gamma)**: removal rate, or the daily probability that an active
+  zombie is removed from the outbreak
+* **decay fraction**: the share of removed zombies that decay instead of being
+  eliminated by survivors
 
-Use:
+The app also reports:
 
 $$
 R_0 = \frac{\beta}{\gamma}
 $$
 
-A larger `beta` generally makes the outbreak spread faster. A larger `gamma` removes zombies faster and generally makes the outbreak easier to stop.
+A larger beta generally causes faster spread. A larger gamma removes active
+zombies more quickly. The decay fraction changes how removed zombies are
+classified, but it does not change the total number removed.
 
-`gamma` determines how many active zombies are removed from the outbreak. The `decay fraction` then determines how those removed zombies are split between `eliminated` and `decayed_zombies`.
+## Presets and Editable Parameters
 
-The simulation should use randomness when deciding how many humans become zombies and how many zombies are removed each day. Running the simulation hundreds or thousands of times will show how much the final outcome can vary even when the starting conditions are identical.
+Presets provide starting values for beta, gamma, and decay fraction.
 
-## MVP Features
+| Preset | Beta | Gamma | Decay fraction |
+| --- | ---: | ---: | ---: |
+| Classic Movie Zombies | 0.10 | 0.05 | 0.10 |
+| Apocalypse Zombies | 0.30 | 0.03 | 0.03 |
+| Runner Zombies | 0.45 | 0.08 | 0.08 |
+| Viral Zombies | 0.75 | 0.25 | 0.05 |
+| Rotter Zombies | 0.18 | 0.15 | 0.70 |
+| Custom | 0.20 | 0.06 | 0.05 |
 
-### Presets
+Selecting a preset loads its values into the controls. Beta, gamma, and decay
+fraction remain editable for every preset, so presets act as starting templates
+rather than locked scenarios. `Custom` provides a neutral starting point for a
+fully user-defined outbreak.
 
-* Classic Movie Zombies
-* Apocalypse Zombies
-* Black Plague Zombies
-* ZOMBIE-19
-* Custom
+## Simulation Controls
 
-Disease-inspired presets use real disease characteristics only as loose inspiration for fictional zombie parameters.
+The Streamlit sidebar allows the user to select:
 
-Each preset has fixed values for:
-
-* `beta`
-* `gamma`
-* `decay fraction`
-
-For **Custom**, the user can edit all three.
-
-### User Inputs
-
-For all scenarios:
-
-* population
+* starting population
 * initial zombies
-* simulation days
-* Monte Carlo runs
+* simulation length from 10 to 365 days
+* 100, 500, 1,000, 5,000, or 10,000 Monte Carlo runs
+* beta
+* gamma
+* decay fraction
+* an optional random seed
 
-For **Custom** only:
-
-* `beta`
-* `gamma`
-* `decay fraction`
+The simulation runs only after the user selects **Run Simulation**. Enabling the
+seed makes the results reproducible when the same inputs and seed are used.
 
 ## Results
 
-Show:
+### Outbreak Setup
 
-* calculated `R0`
-* extinction probability
-* apocalypse probability
-* median survivors
-* peak zombies
+The app summarizes the starting population, initial infected population,
+simulation length, and calculated $R_0$.
 
-An apocalypse is **80% or more of the original population becoming infected**.
+### One Possible Outbreak
 
-## Streamlit Output
+One stochastic simulation reports the final number of susceptible humans,
+active zombies, eliminated zombies, and decayed zombies. A line chart shows all
+four groups over time.
 
-Include three main visualizations:
+### Monte Carlo Summary
 
-### 1. Single Outbreak Curve
+Repeated simulations produce four main summary metrics:
 
-Show one stochastic outbreak from beginning to end.
+* **Zombie extinction probability**: percentage of runs ending with no active
+  zombies
+* **Apocalypse probability**: percentage of runs in which at least 80% of the
+  original population becomes infected
+* **Median survivors**: median number of susceptible humans remaining at the
+  end of the runs
+* **Median peak zombies**: median of the highest active-zombie population
+  reached in each run
 
-Plot the number of:
+## Visualizations
 
-* susceptible humans
-* active zombies
-* removed zombies
+### Single Outbreak Curve
 
-over the simulation period.
+Shows susceptible humans, active zombies, eliminated zombies, and decayed
+zombies across one possible outbreak.
 
-This visualization explains how one possible outbreak develops over time.
+### Possible Outbreak Range
 
-### 2. Monte Carlo Uncertainty / Percentile Chart
+The user can view Monte Carlo uncertainty for any of the four population
+groups. The chart shows:
 
-Run the same scenario many times and summarize how the number of active zombies varies across simulations.
+* the median population by day
+* the middle 50% of outcomes, from the 25th to 75th percentile
+* the middle 90% of outcomes, from the 5th to 95th percentile
 
-Show:
+### Final-Survivor Distribution
 
-* median number of active zombies over time
-* a middle percentile range, such as 25th–75th percentile
-* a wider percentile range, such as 5th–95th percentile
+A histogram shows the number of susceptible humans remaining at the end of
+every Monte Carlo run. Reference lines identify the mean and median survivor
+counts.
 
-This shows that identical starting conditions can produce very different outbreaks because the simulation is stochastic.
+## Project Structure
 
-### 3. Final-Survivor Distribution
+* `model.py`: stochastic outbreak logic and repeated Monte Carlo simulations
+* `plots.py`: Matplotlib visualizations
+* `app.py`: Streamlit controls, metrics, and application layout
 
-For every Monte Carlo run, record the number of susceptible humans remaining at the end of the simulation.
+## Planned Testing
 
-Display these values as a histogram.
+The core MVP is implemented. The next development step is a focused automated
+test suite covering:
 
-This shows:
-
-* the most common survivor outcomes
-* whether outcomes are tightly grouped or highly variable
-* how often the outbreak causes severe population loss
-* how often the outbreak dies out early
-
-Use this chart alongside summary statistics such as median survivors and apocalypse probability.
+* population conservation
+* nonnegative compartment values
+* reproducible results with a fixed seed
+* parameter and Monte Carlo trial validation
+* extinction and apocalypse outcome logic
