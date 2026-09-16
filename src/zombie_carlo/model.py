@@ -9,7 +9,7 @@ class ZombieSIR:
     def __init__(
         self,
         days=100, 
-        population=1000, 
+        humans=1000, 
         initial_zombies=1, 
         beta=0.05, 
         gamma=0.01,
@@ -18,9 +18,9 @@ class ZombieSIR:
     ):
         if not isinstance(days, int) or days <= 0:
             raise ValueError("Days must be a positive integer.")
-        if not isinstance(population, int) or population <= 0:
+        if not isinstance(humans, int) or humans <= 0:
             raise ValueError("Initial population must be a positive integer.")
-        if not isinstance(initial_zombies, int) or initial_zombies <= 0:
+        if not isinstance(initial_zombies, int) or  initial_zombies <= 0:
             raise ValueError("Infected population must be a positive integer.")
         if not 0 <= beta <= 1:
             raise ValueError("Beta must be between 0 and 1.")
@@ -30,9 +30,9 @@ class ZombieSIR:
             raise ValueError("Decay fraction must be between 0 and 1.")
     
         self.days = days
-        self.population = population
-        self.susceptible = population - initial_zombies
+        self.susceptible = humans
         self.infected = initial_zombies
+        self.population = humans + initial_zombies
         self.eliminated = 0
         self.decayed_zombies = 0
         self.beta = beta

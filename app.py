@@ -40,6 +40,14 @@ PRESETS = {
     }
 }
 
+PRESET_DESCRIPTIONS = {
+    "Classic Movie Zombies": "Slower outbreak with moderate zombie removal.",
+    "Apocalypse Zombies": "Fast spread with zombies that are difficult to remove.",
+    "Runner Zombies": "Very fast spread with somewhat stronger zombie removal.",
+    "Viral Zombies": "Extremely fast spread, but zombies are removed quickly.",
+    "Rotter Zombies": "Moderate spread with heavy decay among removed zombies.",
+    "Custom": "A neutral starting point for your own outbreak settings."
+}
 
 def load_preset():
     preset = PRESETS[st.session_state.preset]
@@ -69,13 +77,16 @@ st.sidebar.caption(
     "Choose the outbreak parameters, then select Run Simulation to see the results."
 )
 
-st.sidebar.selectbox(
+selected_preset = st.sidebar.selectbox(
     "Zombie Preset",
     PRESETS.keys(),
     key="preset",
     on_change=load_preset,
     help="Choose a starting scenario. You can adjust its parameters below."
 )
+
+st.sidebar.caption(PRESET_DESCRIPTIONS[selected_preset])
+
 
 use_seed = st.sidebar.toggle(
     "Use Seed",
@@ -95,17 +106,18 @@ else:
 
 
 with st.sidebar.form("simulation_controls"):
-    population = st.number_input(
-        "Population",
-        min_value=2,
+    humans = st.number_input(
+        "Human Population",
+        min_value=10,
         value=1000,
+        max_value=1_000_000,
         help="Total number of humans and zombies at the start of the simulation."
     )
 
-    initial_zombies = st.number_input(
+    initial_zombies = st.slider(
         "Initial Zombies",
         min_value=1,
-        max_value=population - 1,
+        max_value=10,
         value=1,
         help="Number of zombies present when the outbreak begins."
     )
@@ -169,7 +181,7 @@ st.divider()
 
 model = ZombieSIR(
     days=days, 
-    population=population, 
+    humans=humans, 
     initial_zombies=initial_zombies, 
     beta=beta, 
     gamma=gamma,
