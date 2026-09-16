@@ -1,4 +1,4 @@
-"""Unit tests over model parameters."""
+"""Unit tests for ZombieSIR validation, invariants, and reproducibility."""
 
 import pytest
 from pandas.testing import assert_frame_equal
@@ -71,7 +71,6 @@ def test_population_is_conserved():
 def test_population_are_nonnegative():
     model = ZombieSIR(seed=42)
     model.run_simulation()
-
 
     assert (model.results[SIED] >= 0).all().all()
 
