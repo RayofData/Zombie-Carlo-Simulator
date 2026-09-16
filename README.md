@@ -1,11 +1,21 @@
 # Zombie Carlo Simulator
 
-[![Live App](https://img.shields.io/badge/Live_App-Launch-FF4B4B?logo=streamlit&logoColor=white)](https://zombie-carlo-simulator-mksnkffwj9w8nc2nwpqxh7.streamlit.app/)
+Try the live Zombie Carlo Simulator here: 
+ [![Live App](https://img.shields.io/badge/Live_App-Launch-FF4B4B?logo=streamlit&logoColor=white)](https://zombie-carlo-simulator-mksnkffwj9w8nc2nwpqxh7.streamlit.app/) 
 
 Zombie Carlo is a Streamlit Monte Carlo simulator for a fictional zombie
 outbreak. It uses a stochastic SIR-style compartment model to show both one
 possible outbreak and the range of outcomes that can occur under the same
 starting conditions.
+
+## Tools and Technologies
+
+![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-Simulation-013243?logo=numpy&logoColor=white)
+![pandas](https://img.shields.io/badge/pandas-Data_Processing-150458?logo=pandas&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-Visualization-11557C)
+![pytest](https://img.shields.io/badge/pytest-Testing-0A9EDC?logo=pytest&logoColor=white)
 
 ## Core Model
 
@@ -137,14 +147,15 @@ counts.
 
 ## Project Structure
 
-* `model.py`: stochastic outbreak logic and repeated Monte Carlo simulations
+* `model.py`: stochastic outbreak logic and Monte Carlo simulations
 * `plots.py`: Matplotlib visualizations
+* `metrics.py`: summary metrics for simulation results
 * `app.py`: Streamlit controls, metrics, and application layout
 
-## Planned Testing
 
-The core MVP is implemented. The next development step is a focused automated
-test suite covering:
+## Testing
+
+The automated pytest suite covers:
 
 * population conservation
 * nonnegative compartment values
