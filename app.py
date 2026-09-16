@@ -6,6 +6,12 @@ from src.zombie_carlo.plots import (
     monte_carlo_band_plot,
     final_survivors_plot
 )
+from src.zombie_carlo.metrics import (
+    extinction_probability,
+    apocalypse_probability,
+    median_survivors,
+    median_peak_zombies
+)
 
 PRESETS = {
     "Classic Movie Zombies": {
@@ -61,16 +67,11 @@ if "preset" not in st.session_state:
     st.session_state.preset = "Classic Movie Zombies"
     load_preset()
 
-st.title("Zombie Carlo Simulator")
 
-st.write(
-    """
-    Explore how a fictional zombie outbreak can unfold under the same starting
-    conditions. Zombie Carlo uses a stochastic SIR-style model and Monte Carlo
-    simulation to show not just one possible outbreak, but the range of outcomes
-    created by randomness.
-    """
-)
+st.image("static/zombie_banner.png")
+st.caption("Zombie Carlo Simulator")
+
+
 
 st.sidebar.header("Outbreak Setup")
 st.sidebar.caption(
@@ -175,9 +176,52 @@ with st.sidebar.form("simulation_controls"):
     run_simulation = st.form_submit_button("Run Simulation")
 
 if not run_simulation:
-    st.stop()
+    st.markdown(
+        """
+        ## About Zombie Carlo
 
-st.divider()
+        **Zombie Carlo Simulator** models a fictional zombie outbreak using a
+        stochastic SIR-style model and Monte Carlo simulation. Instead of showing
+        one fixed outcome, it shows how the same starting conditions can produce
+        different results because of randomness.
+
+        ### How It Works
+
+        Each day, random draws determine how many humans become zombies and how
+        many active zombies are removed.
+
+        Three main parameters control the outbreak:
+
+        - **Beta (β):** how quickly zombies infect humans
+        - **Gamma (γ):** how quickly active zombies are removed
+        - **Decay fraction:** how many removed zombies decay instead of being
+          eliminated by survivors
+
+        Presets provide starting values, and the sidebar lets you adjust them.
+
+        ### What the Model Tracks
+
+        - **Susceptible:** humans who can still become zombies
+        - **Infected:** active zombies
+        - **Eliminated:** zombies removed by survivors
+        - **Decayed:** zombies removed through decay
+
+        The total population remains constant throughout the simulation.
+
+        ### What the Results Show
+
+        After selecting **Run Simulation**, the app displays:
+
+        - **One Possible Outbreak:** one randomized outbreak over time
+        - **Possible Outbreak Range:** median and percentile ranges across many runs
+        - **Final Survivor Distribution:** survivors remaining after each run
+        - **Summary Metrics:** extinction probability, apocalypse probability,
+          median survivors, and median peak zombies
+
+        Adjust the sidebar controls, then select **Run Simulation** to begin.
+        """
+    )
+    st.stop()
 
 model = ZombieSIR(
     days=days, 
@@ -199,7 +243,15 @@ pop_col, int_inf_col, days_col, R0_col =  st.columns(4)
 pop_col.metric(label="Starting Population", value=model.susceptible+model.infected)
 int_inf_col.metric(label="Initial Infected", value=model.infected)
 days_col.metric(label="Total Days", value=model.days)
-R0_col.metric(label=r"$R_0$", value=round(model.beta/model.gamma,2))
+R0_col.metric(
+    label=r"$R_0$",
+    value=round(model.beta / model.gamma, 2),
+    help=(
+        "Basic reproduction number: the expected number of new zombies "
+        "produced by one active zombie when most of the population is susceptible. "
+        "$R_0$ = $\\beta$ / $\\gamma$. Values above 1 favor outbreak growth; values below 1 favor decline."
+    )
+)
 
 st.divider()
 
@@ -225,10 +277,10 @@ with st.spinner("Running Monte Carlo simulations...", show_time=True):
     results, daily_results = model.run_monte_carlo(trials=trials)
 st.success("Simulations complete!")
 
-extinction_probability = results["zombie_extinct"].mean()*100
-apocalypse_probability = results["apocalypse"].mean()*100
-median_survivors = results["final_survivors"].median()
-median_peak_zombies = results["peak_infected"].median()
+extinction_probability = extinction_probability(results=results)
+apocalypse_probability = apocalypse_probability(results=results)
+median_survivors = median_survivors(results=results)
+median_peak_zombies = median_peak_zombies(results=results)
 
 extinct_col, apocalypse_col, survivors_col, zombie_col = st.columns(4)
 
