@@ -106,8 +106,8 @@ else:
 
 
 with st.sidebar.form("simulation_controls"):
-    population = st.number_input(
-        "Population",
+    humans = st.number_input(
+        "Human Population",
         min_value=10,
         value=1000,
         max_value=1_000_000,
@@ -181,7 +181,7 @@ st.divider()
 
 model = ZombieSIR(
     days=days, 
-    population=population, 
+    humans=humans, 
     initial_zombies=initial_zombies, 
     beta=beta, 
     gamma=gamma,

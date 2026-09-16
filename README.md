@@ -75,7 +75,7 @@ fully user-defined outbreak.
 
 The Streamlit sidebar allows the user to select:
 
-* starting population
+* starting human population
 * initial zombies
 * simulation length from 10 to 365 days
 * 100, 500, 1,000, 5,000, or 10,000 Monte Carlo runs
