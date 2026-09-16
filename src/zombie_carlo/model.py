@@ -20,7 +20,7 @@ class ZombieSIR:
             raise ValueError("Days must be a positive integer.")
         if not isinstance(population, int) or population <= 0:
             raise ValueError("Initial population must be a positive integer.")
-        if not isinstance(initial_zombies, int) or initial_zombies <= 0:
+        if not isinstance(initial_zombies, int) or  population <= initial_zombies <= 0:
             raise ValueError("Infected population must be a positive integer.")
         if not 0 <= beta <= 1:
             raise ValueError("Beta must be between 0 and 1.")
