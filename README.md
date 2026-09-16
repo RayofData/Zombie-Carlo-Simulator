@@ -1,5 +1,7 @@
 # Zombie Carlo Simulator
 
+[![Live App](https://img.shields.io/badge/Live_App-Launch-FF4B4B?logo=streamlit&logoColor=white)](https://zombie-carlo-simulator-mksnkffwj9w8nc2nwpqxh7.streamlit.app/)
+
 Zombie Carlo is a Streamlit Monte Carlo simulator for a fictional zombie
 outbreak. It uses a stochastic SIR-style compartment model to show both one
 possible outbreak and the range of outcomes that can occur under the same
