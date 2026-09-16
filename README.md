@@ -62,7 +62,7 @@ Presets provide starting values for beta, gamma, and decay fraction.
 | Classic Movie Zombies | 0.10 | 0.05 | 0.10 |
 | Apocalypse Zombies | 0.30 | 0.03 | 0.03 |
 | Runner Zombies | 0.45 | 0.08 | 0.08 |
-| Viral Zombies | 0.75 | 0.25 | 0.05 |
+| Viral Zombies | 0.75 | 0.50 | 0.10 |
 | Rotter Zombies | 0.18 | 0.15 | 0.70 |
 | Custom | 0.20 | 0.06 | 0.05 |
 

@@ -25,8 +25,8 @@ PRESETS = {
     },
     "Viral Zombies": {
         "beta": 0.75,
-        "gamma": 0.25,
-        "decay_fraction": 0.05
+        "gamma": 0.50,
+        "decay_fraction": 0.10
     },
     "Rotter Zombies": {
         "beta": 0.18,
